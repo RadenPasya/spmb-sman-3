@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Cek Status Pendaftaran{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-2">Cek Status & Bukti Daftar Ulang</h2>
+    <p class="text-xs text-slate-500 mb-6">Masukkan NISN dan Tanggal Lahir siswa yang didaftarkan.</p>
+
+    <form action="/cek-status" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1">NISN Siswa</label>
+        <input type="number" name="nisn" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-900" placeholder="10 Digit NISN" required>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Tanggal Lahir</label>
+        <input type="date" name="tgl_lahir" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-900" required>
+      </div>
+      <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-medium py-2 rounded-lg text-sm transition">
+        Periksa Data
+      </button>
+    </form>
+
+    {% if siswa %}
+    <div class="mt-8 pt-6 border-t border-slate-200">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-slate-800">Detail Status Siswa</h3>
+        <span class="px-3 py-1 rounded-full text-xs font-semibold 
+          {% if siswa.status == 'Terverifikasi' %}bg-green-100 text-green-800
+          {% elif siswa.status == 'Perlu Revisi' %}bg-red-100 text-red-800
+          {% else %}bg-amber-100 text-amber-800{% endif %}">
+          {{ siswa.status }}
+        </span>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-lg space-y-2 text-sm text-slate-600">
+        <p><strong>Nama:</strong> {{ siswa.nama }}</p>
+        <p><strong>NISN:</strong> {{ siswa.nisn }}</p>
+        <p><strong>Sekolah Asal:</strong> {{ siswa.smp_asal }}</p>
+        <p><strong>Jalur:</strong> {{ siswa.jalur_ppdb }}</p>
+        <p><strong>Waktu Mendaftar:</strong> {{ siswa.created_at }}</p>
+        {% if siswa.catatan_revisi %}
+        <p class="text-red-600 border-t pt-2 mt-2"><strong>Catatan Panitia:</strong> {{ siswa.catatan_revisi }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

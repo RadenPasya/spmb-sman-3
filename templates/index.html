@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Beranda - SPCM SMAN 3 Tambun Selatan{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+  <div class="text-center bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 mb-8">
+    <div class="inline-block bg-blue-100 text-blue-900 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+      Tahun Ajaran Baru
+    </div>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 leading-tight">
+      Sistem Pendaftaran & Daftar Ulang Siswa Baru
+    </h1>
+    <p class="text-slate-600 text-sm md:text-base max-w-2xl mx-auto mb-8">
+      Selamat datang di portal resmi Sistem Pendaftaran &amp; Daftar Ulang (SPCM) SMAN 3 Tambun Selatan.
+    </p>
+    
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="/daftar" class="bg-blue-900 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl shadow transition text-sm">
+        Daftar Ulang Sekarang
+      </a>
+      <a href="/cek-status" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl transition text-sm">
+        Cek Status Pendaftaran
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded-xl border border-slate-200">
+      <div class="w-8 h-8 bg-blue-100 text-blue-900 font-bold rounded-lg flex items-center justify-center mb-3">1</div>
+      <h3 class="font-bold text-slate-900 mb-1">Isi Formulir</h3>
+      <p class="text-xs text-slate-500">Lengkapi data diri, asal sekolah, dan data orang tua/wali.</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200">
+      <div class="w-8 h-8 bg-blue-100 text-blue-900 font-bold rounded-lg flex items-center justify-center mb-3">2</div>
+      <h3 class="font-bold text-slate-900 mb-1">Verifikasi FIFO</h3>
+      <p class="text-xs text-slate-500">Panitia memproses berkas berdasarkan urutan waktu pendaftaran yang masuk duluan.</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200">
+      <div class="w-8 h-8 bg-blue-100 text-blue-900 font-bold rounded-lg flex items-center justify-center mb-3">3</div>
+      <h3 class="font-bold text-slate-900 mb-1">Cek Status</h3>
+      <p class="text-xs text-slate-500">Gunakan NISN + Tanggal Lahir untuk melihat hasil verifikasi.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

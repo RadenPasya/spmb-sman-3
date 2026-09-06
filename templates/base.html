@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SPCM SMAN 3 Tambun Selatan{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+  <!-- Navbar Header -->
+  <header class="bg-blue-900 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg">S3T</div>
+        <div>
+          <h1 class="font-bold text-base md:text-lg leading-tight">SMAN 3 TAMBUN SELATAN</h1>
+          <p class="text-xs text-blue-200">Sistem Pendaftaran & Daftar Ulang (SPCM)</p>
+        </div>
+      </a>
+      <div class="flex space-x-2 text-xs md:text-sm">
+        <a href="/daftar" class="bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition">Daftar Ulang</a>
+        <a href="/cek-status" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-3 py-1.5 rounded-lg transition">Cek Status</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Message (Pesan Notifikasi) -->
+  <div class="max-w-3xl mx-auto w-full px-4 mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="p-4 mb-3 text-sm rounded-lg border {% if category == 'success' %}bg-green-50 text-green-800 border-green-200{% elif category == 'danger' %}bg-red-50 text-red-800 border-red-200{% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Content Halaman -->
+  <main class="mb-auto">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500">
+    &copy; 2026 SMAN 3 Tambun Selatan. All rights reserved. | <a href="/admin/login" class="text-slate-400 hover:underline">Akses Panitia</a>
+  </footer>
+
+</body>
+</html>

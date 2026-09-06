@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Panitia SPCM{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900">Dashboard Antrean Panitia (FIFO)</h2>
+      <p class="text-xs text-slate-500">Antrean diurutkan dari yang paling awal mendaftar.</p>
+    </div>
+    <a href="/admin/logout" class="bg-red-600 text-white text-xs px-3 py-2 rounded-lg hover:bg-red-700">Logout</a>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
+      <thead class="bg-slate-100 text-slate-700 uppercase text-xs">
+        <tr>
+          <th class="p-3 border-b">No / Antrean</th>
+          <th class="p-3 border-b">Waktu Masuk</th>
+          <th class="p-3 border-b">NISN & Nama</th>
+          <th class="p-3 border-b">Sekolah Asal</th>
+          <th class="p-3 border-b">Status</th>
+          <th class="p-3 border-b text-center">Aksi Verifikasi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for s in antrean %}
+        <tr class="hover:bg-slate-50">
+          <td class="p-3 font-bold text-blue-900">#{{ loop.index }}</td>
+          <td class="p-3 text-xs text-slate-500">{{ s.created_at }}</td>
+          <td class="p-3">
+            <div class="font-bold">{{ s.nama }}</div>
+            <div class="text-xs text-slate-500">NISN: {{ s.nisn }} | HP: {{ s.no_hp }}</div>
+          </td>
+          <td class="p-3">{{ s.smp_asal }} ({{ s.jalur_ppdb }})</td>
+          <td class="p-3">
+            <span class="px-2 py-1 rounded-full text-xs font-semibold 
+              {% if s.status == 'Terverifikasi' %}bg-green-100 text-green-800
+              {% elif s.status == 'Perlu Revisi' %}bg-red-100 text-red-800
+              {% else %}bg-amber-100 text-amber-800{% endif %}">
+              {{ s.status }}
+            </span>
+          </td>
+          <td class="p-3">
+            <div class="flex justify-center space-x-2">
+              <form action="/admin/verifikasi/{{ s.id }}/Terverifikasi" method="POST">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs px-2.5 py-1.5 rounded-lg">Terima</button>
+              </form>
+              <form action="/admin/verifikasi/{{ s.id }}/Perlu Revisi" method="POST" class="flex space-x-1">
+                <input type="text" name="catatan" placeholder="Alasan revisi..." class="text-xs border rounded px-1 w-24">
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-2.5 py-1.5 rounded-lg">Tolak</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="p-4 text-center text-slate-400">Belum ada data pendaftar masuk.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
