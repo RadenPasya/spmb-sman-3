@@ -1,0 +1,6 @@
+{
+  "name": "spmb-sman3-tamsel",
+  "private": true,
+  "scripts": {"build": "echo build done"},
+  "dependencies": {}
+}
