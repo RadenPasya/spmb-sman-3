@@ -21,6 +21,7 @@ Jalur:
    - SUPABASE_URL
    - SUPABASE_ANON_KEY
 4. Deploy
+5. Testing
 
 Frontend: index.html (prototype clean professional)
 Backend: api/index.py (Python FastAPI)
