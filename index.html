@@ -630,6 +630,18 @@ async function loadQueue() {
 
         for (const value of values) {
           const cell = document.createElement("td");
+          if (item.status === "dipanggil") {
+  const repeatButton = document.createElement("button");
+
+  repeatButton.textContent = "Panggil Ulang";
+  repeatButton.style.marginLeft = "8px";
+
+  repeatButton.addEventListener("click", () => {
+    speakQueueCall(item);
+  });
+
+  actionCell.appendChild(repeatButton);
+}
           cell.textContent = value ?? "-";
           row.appendChild(cell);
         }
@@ -673,7 +685,31 @@ async function loadQueue() {
     }
 
     
+function speakQueueCall(item) {
+  if (!("speechSynthesis" in window)) {
+    alert("Browser tidak mendukung fitur suara.");
+    return;
+  }
 
+  const nomor = item.nomor_antrian;
+  const nama = item.pendaftar?.nama || item.nama || "Peserta";
+
+  const text =
+    `Nomor antrean ${nomor}, atas nama ${nama}, ` +
+    `silakan menuju meja verifikasi.`;
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.lang = "id-ID";
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  window.speechSynthesis.speak(utterance);
+}
+    
 async function updateQueueStatus(item) {
   const nextStatus = {
     pending: "dipanggil",
@@ -719,6 +755,10 @@ async function updateQueueStatus(item) {
   }
 
   // 3. Muat ulang antrean
+ if (nextStatus === "dipanggil") {
+  speakQueueCall(item);
+}
+  
   await loadQueue();
 }
     // =================================================
