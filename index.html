@@ -577,7 +577,7 @@ async function loadQueue() {
     const { data: pendaftarData, error: pendaftarError } =
       await supabase
         .from("pendaftar")
-        .select("id, nisn, nama, jalur_id, status")
+        .select("id, nisn, nama, nomor_pendaftaran, jalur_id, status")
         .in("id", ids);
 
     if (pendaftarError) {
@@ -599,7 +599,7 @@ async function loadQueue() {
         id: item.pendaftar_id,
         nama: item.nama || pendaftar.nama || "-",
         nisn: pendaftar.nisn || "-",
-        nomor_pendaftaran: item.pendaftar_id || "-"
+       nomor_pendaftaran: pendaftar.nomor_pendaftaran || "-"
       }
     };
   });
