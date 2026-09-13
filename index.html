@@ -593,7 +593,7 @@ async function loadQueue() {
 
     return {
       ...item,
-      created_at: item.dipanggil_at,
+      created_at: item.created_at,
       pendaftar: {
         id: item.pendaftar_id,
         nama: item.nama || pendaftar.nama || "-",
@@ -607,82 +607,98 @@ async function loadQueue() {
 }
 
     function renderQueue() {
-      const body = $("queueBody");
-      body.innerHTML = "";
+  const body = $("queueBody");
+  body.innerHTML = "";
 
-      const sorted = [...queueData].sort((a, b) =>
-        new Date(a.created_at) - new Date(b.created_at)
-      );
+  const sorted = [...queueData].sort((a, b) =>
+    new Date(a.created_at) - new Date(b.created_at)
+  );
 
-      for (const item of sorted) {
-        const pendaftar = item.pendaftar;
-        if (!pendaftar) continue;
+  for (const item of sorted) {
+    const pendaftar = item.pendaftar;
 
-        const row = document.createElement("tr");
+    if (!pendaftar) continue;
 
-        const values = [
-          item.nomor_antrian,
-          pendaftar.nomor_pendaftaran,
-          pendaftar.nama,
-          pendaftar.nisn,
-          item.jalur_id
-        ];
+    const row = document.createElement("tr");
 
-        for (const value of values) {
-          const cell = document.createElement("td");
-          if (item.status === "dipanggil") {
-  const repeatButton = document.createElement("button");
+    const values = [
+      item.nomor_antrian,
+      pendaftar.nomor_pendaftaran,
+      pendaftar.nama,
+      pendaftar.nisn,
+      item.jalur_id
+    ];
 
-  repeatButton.textContent = "Panggil Ulang";
-  repeatButton.style.marginLeft = "8px";
-
-  repeatButton.addEventListener("click", () => {
-    speakQueueCall(item);
-  });
-
-  actionCell.appendChild(repeatButton);
-}
-          cell.textContent = value ?? "-";
-          row.appendChild(cell);
-        }
-
-        const statusCell = document.createElement("td");
-        const badge = document.createElement("span");
-        badge.className = "status " + item.status;
-        badge.textContent = formatStatus(item.status);
-        statusCell.appendChild(badge);
-        row.appendChild(statusCell);
-
-        const actionCell = document.createElement("td");
-        const action = document.createElement("button");
-        
-        action.textContent =
-  item.status === "pending" ? "Panggil" :
-  item.status === "dipanggil" ? "Selesaikan" :
-  item.status === "selesai" ? "Selesai" :
-  "Ubah status";
-
-        action.addEventListener("click", () =>
-          updateQueueStatus(item)
-        );
-
-        actionCell.appendChild(action);
-        row.appendChild(actionCell);
-
-        body.appendChild(row);
-      }
-
-      if (!body.children.length) {
-        body.innerHTML =
-          '<tr><td colspan="7">Belum ada antrean.</td></tr>';
-      }
-
-      $("totalQueue").textContent = queueData.length;
-      $("pendingQueue").textContent =
-        queueData.filter(x => x.status === "pending").length;
-      $("doneQueue").textContent =
-        queueData.filter(x => x.status === "selesai").length;
+    for (const value of values) {
+      const cell = document.createElement("td");
+      cell.textContent = value ?? "-";
+      row.appendChild(cell);
     }
+
+    // Kolom status
+    const statusCell = document.createElement("td");
+    const badge = document.createElement("span");
+
+    badge.className = "status " + item.status;
+    badge.textContent = formatStatus(item.status);
+
+    statusCell.appendChild(badge);
+    row.appendChild(statusCell);
+
+    // Kolom aksi
+    const actionCell = document.createElement("td");
+
+    // Tombol Panggil / Selesaikan
+    const action = document.createElement("button");
+
+    action.textContent =
+      item.status === "pending" || item.status === "menunggu"
+        ? "Panggil"
+        : item.status === "dipanggil"
+        ? "Selesaikan"
+        : item.status === "selesai"
+        ? "Selesai"
+        : "Ubah status";
+
+    action.addEventListener("click", () => {
+      updateQueueStatus(item);
+    });
+
+    actionCell.appendChild(action);
+
+    // Tombol Panggil Ulang
+    if (item.status === "dipanggil") {
+      const repeatButton = document.createElement("button");
+
+      repeatButton.textContent = "Panggil Ulang";
+      repeatButton.style.marginLeft = "8px";
+
+      repeatButton.addEventListener("click", () => {
+        speakQueueCall(item);
+      });
+
+      actionCell.appendChild(repeatButton);
+    }
+
+    row.appendChild(actionCell);
+    body.appendChild(row);
+  }
+
+  if (!body.children.length) {
+    body.innerHTML =
+      '<tr><td colspan="7">Belum ada antrean.</td></tr>';
+  }
+
+  $("totalQueue").textContent = queueData.length;
+
+  $("pendingQueue").textContent =
+    queueData.filter(x =>
+      x.status === "pending" || x.status === "menunggu"
+    ).length;
+
+  $("doneQueue").textContent =
+    queueData.filter(x => x.status === "selesai").length;
+}
 
     
 function speakQueueCall(item) {
