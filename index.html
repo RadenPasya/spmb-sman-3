@@ -451,39 +451,31 @@
     // CEK STATUS USER
     // =================================================
 
-    $("statusForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
+    
+$("statusForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-      const nomor = $("statusNumber").value.trim();
+  const nomor = $("statusNumber").value.trim();
 
-      const { data, error } = await supabase
-        .from("pendaftar")
-        .select(`
-          nomor_pendaftaran,
-          status,
-          jalur_id,
-          antrian_verifikasi (
-            nomor_antrian,
-            status
-          )
-        `)
-        .eq("nomor_pendaftaran", nomor)
-        .maybeSingle();
+  const { data, error } = await supabase.rpc("cek_status_spmb", {
+    p_nomor_pendaftaran: nomor
+  });
 
-      if (error || !data) {
-        showMessage($("statusMessage"),
-          "Data tidak ditemukan atau belum dapat diakses.", true);
-        return;
-      }
+  if (error || !data) {
+    showMessage(
+      $("statusMessage"),
+      error?.message || "Data tidak ditemukan.",
+      true
+    );
+    return;
+  }
 
-      const antrean = Array.isArray(data.antrian_verifikasi)
-        ? data.antrian_verifikasi[0]
-        : data.antrian_verifikasi;
-
-      showMessage($("statusMessage"),
-        `Nomor antrean: ${antrean?.nomor_antrian ?? "-"} | ` +
-        `Status: ${formatStatus(data.status)}`);
-    });
+  showMessage(
+    $("statusMessage"),
+    `Nomor antrean: ${data.nomor_antrian} | ` +
+    `Status: ${formatStatus(data.status)}`
+  );
+});
 
     // =================================================
     // LOGIN ADMIN
