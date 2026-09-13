@@ -1,86 +1,725 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SPMB SMAN 3 TAMSEL</title>
-  
-  <!-- Bagian 1: Tailwind CSS (Minified) -->
-  <!-- Disarankan untuk memindahkan isi ini ke file style.css -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPMB SMA Negeri 3 Tambun Selatan</title>
   <style>
-    *, :after, :before { box-sizing: border-box; border: 0 solid #e5e7eb; }
-    /* ... (Kode CSS Tailwind lainnya) ... */
+    :root {
+      --primary: #166534;
+      --primary-dark: #14532d;
+      --background: #f4f7f5;
+      --card: #ffffff;
+      --text: #17231b;
+      --muted: #647067;
+      --border: #dce5de;
+      --danger: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 24px;
+    }
+
+    header .header-inner {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    header p { margin: 0; opacity: .9; }
+
+    main {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+
+    button.secondary {
+      background: #e7eee9;
+      color: var(--text);
+    }
+
+    button.danger { background: var(--danger); }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      background: white;
+    }
+
+    .hidden { display: none !important; }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      background: #edf5ee;
+      margin: 12px 0;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .ticket {
+      text-align: center;
+      background: #f0fdf4;
+      border: 2px dashed var(--primary);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .ticket .number {
+      font-size: 56px;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 12px 0;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th { background: #f0f5f1; }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #e5e7eb;
+      font-size: 13px;
+    }
+
+    .status.pending { background: #fef3c7; }
+    .status.dipanggil { background: #dbeafe; }
+    .status.selesai { background: #dcfce7; }
+    .status.ditolak { background: #fee2e2; }
+
+    .muted { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 20px; }
+      .card { padding: 18px; }
+      .ticket .number { font-size: 44px; }
+    }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <header>
+    <div class="header-inner">
+      <h1>SPMB SMA Negeri 3 Tambun Selatan</h1>
+      <p>Sistem Pendaftaran dan Antrean Verifikasi</p>
+    </div>
+  </header>
 
-  <!-- Bagian 2: Logika Aplikasi React (Minified) -->
-  <!-- Disarankan untuk memindahkan script ini ke file terpisah, misalnya app.js -->
+  <main>
+    <div class="tabs">
+      <button id="tabUser">Pendaftaran Siswa</button>
+      <button id="tabAdmin" class="secondary">Login Admin</button>
+    </div>
+
+    <!-- HALAMAN USER -->
+    <section id="userPage">
+      <div class="card">
+        <h2>Pendaftaran SPMB</h2>
+        <p class="muted">
+          Silakan isi data dengan benar. Upload dokumen belum tersedia
+          pada tahap pengembangan sistem antrean.
+        </p>
+
+        <form id="registrationForm">
+          <label for="nama">Nama lengkap</label>
+          <input id="nama" name="nama" maxlength="120" required
+                 placeholder="Masukkan nama lengkap">
+
+          <label for="nisn">NISN</label>
+          <input id="nisn" name="nisn" maxlength="30" required
+                 placeholder="Masukkan NISN">
+
+          <label for="jalur">Pilih jalur</label>
+          <select id="jalur" name="jalur" required>
+            <option value="">Memuat jalur...</option>
+          </select>
+
+          <button type="submit" id="registerButton">
+            Daftar dan Ambil Nomor Antrean
+          </button>
+        </form>
+
+        <div id="registrationMessage" class="message hidden"></div>
+      </div>
+
+      <div id="ticketCard" class="ticket hidden">
+        <h2>Pendaftaran Berhasil</h2>
+        <p>Nomor antrean kamu:</p>
+        <div id="ticketNumber" class="number">-</div>
+        <p id="ticketInfo"></p>
+        <p class="muted">
+          Simpan nomor pendaftaran untuk melihat status selanjutnya.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Cek Status Antrean</h2>
+        <p class="muted">
+          Masukkan nomor pendaftaran yang kamu terima.
+        </p>
+
+        <form id="statusForm">
+          <label for="statusNumber">Nomor pendaftaran</label>
+          <input id="statusNumber" required placeholder="Contoh: SPMB-2026-0001">
+          <button type="submit">Cek Status</button>
+        </form>
+
+        <div id="statusMessage" class="message hidden"></div>
+      </div>
+    </section>
+
+    <!-- HALAMAN ADMIN -->
+    <section id="adminPage" class="hidden">
+      <div id="loginCard" class="card">
+        <h2>Login Admin</h2>
+
+        <form id="loginForm">
+          <label for="email">Email admin</label>
+          <input type="email" id="email" required>
+
+          <label for="password">Password</label>
+          <input type="password" id="password" required>
+
+          <button type="submit">Login</button>
+        </form>
+
+        <div id="loginMessage" class="message hidden"></div>
+      </div>
+
+      <div id="dashboard" class="hidden">
+        <div class="card">
+          <h2>Dashboard Antrean</h2>
+          <p class="muted">
+            Data diperbarui otomatis melalui Supabase Realtime.
+          </p>
+
+          <div class="grid">
+            <div>
+              <strong>Total antrean</strong>
+              <h2 id="totalQueue">0</h2>
+            </div>
+            <div>
+              <strong>Menunggu</strong>
+              <h2 id="pendingQueue">0</h2>
+            </div>
+            <div>
+              <strong>Sudah selesai</strong>
+              <h2 id="doneQueue">0</h2>
+            </div>
+          </div>
+
+          <button id="logoutButton" class="secondary">Logout</button>
+        </div>
+
+        <div class="card">
+          <h2>Daftar Antrean FIFO</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Nomor Pendaftaran</th>
+                  <th>Nama</th>
+                  <th>NISN</th>
+                  <th>Jalur</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="queueBody">
+                <tr>
+                  <td colspan="7">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <script type="module">
-    // 1. Library React & ReactDOM
-    var bp = Object.create; 
-    // ... (Kode library React yang sangat panjang) ...
+    import { createClient } from
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // 2. Data Konfigurasi SPMB SMAN 3 Tambun Selatan
-    var Ve = {
-      nama: "SMA Negeri 3 Tambun Selatan",
-      short: "SMAN 3 Tambun Selatan",
-      tahun: "2026/2027",
-      npsn: "70012345"
-    };
+    // =================================================
+    // KONFIGURASI
+    // Ganti dua nilai berikut dengan konfigurasi project
+    // Supabase kamu.
+    // =================================================
 
-    var Yt = {
-      "Zonasi": { persen: 50, kuota: 180 },
-      "Prestasi Akademik": { persen: 25, kuota: 90 },
-      "Prestasi Non Akademik": { persen: 25, kuota: 90 }
-    };
+    const SUPABASE_URL = "GANTI_DENGAN_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "GANTI_DENGAN_SUPABASE_ANON_KEY";
 
-    // 3. Komponen Utama Aplikasi (Dashboard SPMB)
-    function Rf() {
-      let [e, t] = D.useState("landing");
-      let [n, r] = D.useState("siswa");
-      // ... (Logika state dan render UI aplikasi) ...
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const $ = (id) => document.getElementById(id);
+
+    let jalurData = [];
+    let queueData = [];
+    let realtimeChannel = null;
+
+    function showMessage(element, message, isError = false) {
+      element.textContent = message;
+      element.classList.remove("hidden", "error");
+      if (isError) element.classList.add("error");
     }
 
-    // 4. Render Aplikasi ke dalam <div id="root">
-    Dp.createRoot(document.getElementById("root")).render(
-      i(Mp.default.StrictMode, { children: i(Rf, {}) })
-    );
-  </script>
+    function hideMessage(element) {
+      element.classList.add("hidden");
+    }
 
-  <!-- Bagian 3: Script Utilitas Eksternal Link -->
-  <script>
-    (function() {
-      function m(a) {
-        var h = a.getAttribute("href");
-        if (!h) return;
-        try {
-          var u = new URL(h, document.baseURI);
-          if ((u.protocol === "http:" || u.protocol === "https:") && u.host !== location.host) {
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-          }
-        } catch (e) {}
+    function setPage(page) {
+      $("userPage").classList.toggle("hidden", page !== "user");
+      $("adminPage").classList.toggle("hidden", page !== "admin");
+
+      $("tabUser").classList.toggle("secondary", page !== "user");
+      $("tabAdmin").classList.toggle("secondary", page !== "admin");
+    }
+
+    function formatStatus(status) {
+      const labels = {
+        pending: "Menunggu",
+        dipanggil: "Dipanggil",
+        selesai: "Selesai",
+        ditolak: "Ditolak"
+      };
+
+      return labels[status] || status;
+    }
+
+    // =================================================
+    // DATA JALUR
+    // =================================================
+
+    async function loadJalur() {
+      const { data, error } = await supabase
+        .from("jalur")
+        .select("id, nama, kuota, persen")
+        .order("id");
+
+      if (error) {
+        showMessage($("registrationMessage"),
+          "Gagal memuat jalur: " + error.message, true);
+        return;
       }
 
-      function s() {
-        document.querySelectorAll("a[href]").forEach(m);
+      jalurData = data || [];
+      $("jalur").innerHTML = '<option value="">Pilih jalur</option>';
+
+      for (const item of jalurData) {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent =
+          `${item.nama} — Kuota ${item.kuota}`;
+        $("jalur").appendChild(option);
+      }
+    }
+
+    // =================================================
+    // PENDAFTARAN USER
+    // =================================================
+
+    $("registrationForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const button = $("registerButton");
+      button.disabled = true;
+      button.textContent = "Memproses...";
+
+      hideMessage($("registrationMessage"));
+      $("ticketCard").classList.add("hidden");
+
+      const nama = $("nama").value.trim();
+      const nisn = $("nisn").value.trim();
+      const jalur = $("jalur").value;
+
+      const { data, error } = await supabase.rpc("daftar_spmb", {
+        p_nama: nama,
+        p_nisn: nisn,
+        p_jalur_id: jalur
+      });
+
+      button.disabled = false;
+      button.textContent = "Daftar dan Ambil Nomor Antrean";
+
+      if (error) {
+        showMessage($("registrationMessage"),
+          error.message, true);
+        return;
       }
 
-      if (document.readyState !== "loading") {
-        s();
-      } else {
-        document.addEventListener("DOMContentLoaded", s);
+      $("ticketNumber").textContent =
+        data.nomor_antrian;
+
+      $("ticketInfo").textContent =
+        `Nomor pendaftaran: ${data.nomor_pendaftaran}`;
+
+      $("ticketCard").classList.remove("hidden");
+      showMessage($("registrationMessage"),
+        "Pendaftaran berhasil dibuat.");
+      $("registrationForm").reset();
+    });
+
+    // =================================================
+    // CEK STATUS USER
+    // =================================================
+
+    $("statusForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nomor = $("statusNumber").value.trim();
+
+      const { data, error } = await supabase
+        .from("pendaftar")
+        .select(`
+          nomor_pendaftaran,
+          status,
+          jalur_id,
+          antrian_verifikasi (
+            nomor_antrian,
+            status
+          )
+        `)
+        .eq("nomor_pendaftaran", nomor)
+        .maybeSingle();
+
+      if (error || !data) {
+        showMessage($("statusMessage"),
+          "Data tidak ditemukan atau belum dapat diakses.", true);
+        return;
       }
 
-      document.addEventListener("click", function(e) {
-        var a = e.target && e.target.closest && e.target.closest("a[href]");
-        if (a) {
-          m(a);
+      const antrean = Array.isArray(data.antrian_verifikasi)
+        ? data.antrian_verifikasi[0]
+        : data.antrian_verifikasi;
+
+      showMessage($("statusMessage"),
+        `Nomor antrean: ${antrean?.nomor_antrian ?? "-"} | ` +
+        `Status: ${formatStatus(data.status)}`);
+    });
+
+    // =================================================
+    // LOGIN ADMIN
+    // =================================================
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: $("email").value.trim(),
+        password: $("password").value
+      });
+
+      if (error) {
+        showMessage($("loginMessage"),
+          "Login gagal: " + error.message, true);
+        return;
+      }
+
+      await checkAdminSession();
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      stopRealtime();
+      showAdminLoggedOut();
+    });
+
+    async function checkAdminSession() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        showAdminLoggedOut();
+        return;
+      }
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error || !profile || profile.role !== "admin") {
+        await supabase.auth.signOut();
+        showMessage($("loginMessage"),
+          "Akun ini bukan admin.", true);
+        showAdminLoggedOut();
+        return;
+      }
+
+      $("loginCard").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+
+      await loadQueue();
+      startRealtime();
+    }
+
+    function showAdminLoggedOut() {
+      $("loginCard").classList.remove("hidden");
+      $("dashboard").classList.add("hidden");
+    }
+
+    // =================================================
+    // DASHBOARD ANTREAN
+    // =================================================
+
+    async function loadQueue() {
+      const { data, error } = await supabase
+        .from("antrian_verifikasi")
+        .select(`
+          id,
+          nomor_antrian,
+          jalur_id,
+          status,
+          created_at,
+          pendaftar (
+            id,
+            nomor_pendaftaran,
+            nama,
+            nisn,
+            status
+          )
+        `)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      queueData = data || [];
+      renderQueue();
+    }
+
+    function renderQueue() {
+      const body = $("queueBody");
+      body.innerHTML = "";
+
+      const sorted = [...queueData].sort((a, b) =>
+        new Date(a.created_at) - new Date(b.created_at)
+      );
+
+      for (const item of sorted) {
+        const pendaftar = item.pendaftar;
+        if (!pendaftar) continue;
+
+        const row = document.createElement("tr");
+
+        const values = [
+          item.nomor_antrian,
+          pendaftar.nomor_pendaftaran,
+          pendaftar.nama,
+          pendaftar.nisn,
+          item.jalur_id
+        ];
+
+        for (const value of values) {
+          const cell = document.createElement("td");
+          cell.textContent = value ?? "-";
+          row.appendChild(cell);
         }
-      }, true);
-    })();
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "status " + item.status;
+        badge.textContent = formatStatus(item.status);
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+
+        const actionCell = document.createElement("td");
+        const action = document.createElement("button");
+        action.textContent =
+          item.status === "pending" ? "Panggil" :
+          item.status === "dipanggil" ? "Selesaikan" :
+          "Ubah status";
+
+        action.addEventListener("click", () =>
+          updateQueueStatus(item)
+        );
+
+        actionCell.appendChild(action);
+        row.appendChild(actionCell);
+
+        body.appendChild(row);
+      }
+
+      if (!body.children.length) {
+        body.innerHTML =
+          '<tr><td colspan="7">Belum ada antrean.</td></tr>';
+      }
+
+      $("totalQueue").textContent = queueData.length;
+      $("pendingQueue").textContent =
+        queueData.filter(x => x.status === "pending").length;
+      $("doneQueue").textContent =
+        queueData.filter(x => x.status === "selesai").length;
+    }
+
+    async function updateQueueStatus(item) {
+      const nextStatus = {
+        pending: "dipanggil",
+        dipanggil: "selesai",
+        selesai: "pending",
+        ditolak: "pending"
+      }[item.status];
+
+      const { error: queueError } = await supabase
+        .from("antrian_verifikasi")
+        .update({
+          status: nextStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", item.id);
+
+      if (queueError) {
+        alert("Gagal mengubah status: " + queueError.message);
+        return;
+      }
+
+      if (item.pendaftar?.id) {
+        await supabase
+          .from("pendaftar")
+          .update({
+            status: nextStatus,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", item.pendaftar.id);
+      }
+    }
+
+    // =================================================
+    // SUPABASE REALTIME
+    // =================================================
+
+    function startRealtime() {
+      stopRealtime();
+
+      realtimeChannel = supabase
+        .channel("spmb-live-queue")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "antrian_verifikasi"
+          },
+          () => loadQueue()
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "pendaftar"
+          },
+          () => loadQueue()
+        )
+        .subscribe();
+    }
+
+    function stopRealtime() {
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+    }
+
+    // =================================================
+    // NAVIGASI DAN INIT
+    // =================================================
+
+    $("tabUser").addEventListener("click", () => setPage("user"));
+    $("tabAdmin").addEventListener("click", () => setPage("admin"));
+
+    await loadJalur();
+    await checkAdminSession();
   </script>
 </body>
 </html>
