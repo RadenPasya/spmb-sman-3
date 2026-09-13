@@ -542,33 +542,54 @@ $("statusForm").addEventListener("submit", async (event) => {
     // DASHBOARD ANTREAN
     // =================================================
 
-    async function loadQueue() {
-      const { data, error } = await supabase
-        .from("antrian_verifikasi")
-        .select(`
-          id,
-          nomor_antrian,
-          jalur_id,
-          status,
-          created_at,
-          pendaftar (
-            id,
-            nomor_pendaftaran,
-            nama,
-            nisn,
-            status
-          )
-        `)
-        .order("created_at", { ascending: true });
+    
+async function loadQueue() {
+  const { data, error } = await supabase
+    .from("panggilan")
+    .select("*")
+    .order("nomor_antrian", { ascending: true });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
+  if (error) {
+    console.error("Gagal mengambil data panggilan:", error);
+    return;
+  }
 
-      queueData = data || [];
-      renderQueue();
+  // Ambil data pendaftar berdasarkan ID
+  const pendaftarIds = (data || [])
+    .map(item => item.pendaftar_id)
+    .filter(Boolean);
+
+  let pendaftarMap = {};
+
+  if (pendaftarIds.length > 0) {
+    const { data: pendaftarData, error: pendaftarError } =
+      await supabase
+        .from("pendaftar")
+        .select("id, nomor_pendaftaran, nama, nisn, status")
+        .in("id", pendaftarIds);
+
+    if (pendaftarError) {
+      console.error("Gagal mengambil data pendaftar:", pendaftarError);
+      return;
     }
+
+    for (const p of pendaftarData || []) {
+      pendaftarMap[p.id] = p;
+    }
+  }
+
+  // Samakan bentuk data agar bisa digunakan dashboard
+  queueData = (data || []).map(item => ({
+    ...item,
+    pendaftar: pendaftarMap[item.pendaftar_id] || {
+      nama: item.nama,
+      nisn: "-",
+      nomor_pendaftaran: "-"
+    }
+  }));
+
+  renderQueue();
+}
 
     function renderQueue() {
       const body = $("queueBody");
@@ -634,68 +655,83 @@ $("statusForm").addEventListener("submit", async (event) => {
         queueData.filter(x => x.status === "selesai").length;
     }
 
-    async function updateQueueStatus(item) {
-      const nextStatus = {
-        pending: "dipanggil",
-        dipanggil: "selesai",
-        selesai: "pending",
-        ditolak: "pending"
-      }[item.status];
+    
+async function updateQueueStatus(item) {
+  const nextStatus = {
+    pending: "dipanggil",
+    menunggu: "dipanggil",
+    dipanggil: "selesai",
+    selesai: "pending",
+    ditolak: "pending"
+  }[item.status];
 
-      const { error: queueError } = await supabase
-        .from("antrian_verifikasi")
-        .update({
-          status: nextStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", item.id);
+  if (!nextStatus) {
+    alert("Status antrean tidak dikenali.");
+    return;
+  }
 
-      if (queueError) {
-        alert("Gagal mengubah status: " + queueError.message);
-        return;
-      }
+  const { error: queueError } = await supabase
+    .from("panggilan")
+    .update({
+      status: nextStatus
+    })
+    .eq("id", item.id);
 
-      if (item.pendaftar?.id) {
-        await supabase
-          .from("pendaftar")
-          .update({
-            status: nextStatus,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", item.pendaftar.id);
-      }
+  if (queueError) {
+    alert("Gagal mengubah status: " + queueError.message);
+    console.error(queueError);
+    return;
+  }
+
+  if (item.pendaftar_id) {
+    const { error: pendaftarError } = await supabase
+      .from("pendaftar")
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", item.pendaftar_id);
+
+    if (pendaftarError) {
+      console.error(
+        "Status pendaftar gagal diperbarui:",
+        pendaftarError
+      );
     }
+  }
 
+  await loadQueue();
+}
     // =================================================
     // SUPABASE REALTIME
     // =================================================
 
-    function startRealtime() {
-      stopRealtime();
+    
+function startRealtime() {
+  stopRealtime();
 
-      realtimeChannel = supabase
-        .channel("spmb-live-queue")
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "antrian_verifikasi"
-          },
-          () => loadQueue()
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "pendaftar"
-          },
-          () => loadQueue()
-        )
-        .subscribe();
-    }
-
+  realtimeChannel = supabase
+    .channel("spmb-live-queue")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "panggilan"
+      },
+      () => loadQueue()
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "pendaftar"
+      },
+      () => loadQueue()
+    )
+    .subscribe();
+}
     function stopRealtime() {
       if (realtimeChannel) {
         supabase.removeChannel(realtimeChannel);
