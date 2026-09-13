@@ -546,16 +546,15 @@ $("statusForm").addEventListener("submit", async (event) => {
 
 async function loadQueue() {
   const { data, error } = await supabase
-    .from("panggilan")
+    .from("antrian_verifikasi")
     .select(`
-      id,
-      pendaftar_id,
-      nomor_antrian,
-      nama,
-      jalur_id,
-      dipanggil_at,
-      status
-    `)
+  id,
+  pendaftar_id,
+  nomor_antrian,
+  jalur_id,
+  created_at,
+  status
+`)
     .order("nomor_antrian", { ascending: true });
 
   if (error) {
