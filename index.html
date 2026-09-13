@@ -543,50 +543,66 @@ $("statusForm").addEventListener("submit", async (event) => {
     // =================================================
 
     
+
 async function loadQueue() {
   const { data, error } = await supabase
     .from("panggilan")
-    .select("*")
+    .select(`
+      id,
+      pendaftar_id,
+      nomor_antrian,
+      nama,
+      jalur_id,
+      dipanggil_at,
+      status
+    `)
     .order("nomor_antrian", { ascending: true });
 
   if (error) {
     console.error("Gagal mengambil data panggilan:", error);
+    $("queueBody").innerHTML =
+      `<tr><td colspan="7">
+        Gagal memuat data: ${error.message}
+      </td></tr>`;
     return;
   }
 
-  // Ambil data pendaftar berdasarkan ID
-  const pendaftarIds = (data || [])
+  const ids = (data || [])
     .map(item => item.pendaftar_id)
     .filter(Boolean);
 
   let pendaftarMap = {};
 
-  if (pendaftarIds.length > 0) {
+  if (ids.length > 0) {
     const { data: pendaftarData, error: pendaftarError } =
       await supabase
         .from("pendaftar")
-        .select("id, nomor_pendaftaran, nama, nisn, status")
-        .in("id", pendaftarIds);
+        .select("id, nisn, nama, jalur_id, status")
+        .in("id", ids);
 
     if (pendaftarError) {
-      console.error("Gagal mengambil data pendaftar:", pendaftarError);
-      return;
-    }
-
-    for (const p of pendaftarData || []) {
-      pendaftarMap[p.id] = p;
+      console.error("Gagal mengambil pendaftar:", pendaftarError);
+    } else {
+      for (const p of pendaftarData || []) {
+        pendaftarMap[p.id] = p;
+      }
     }
   }
 
-  // Samakan bentuk data agar bisa digunakan dashboard
-  queueData = (data || []).map(item => ({
-    ...item,
-    pendaftar: pendaftarMap[item.pendaftar_id] || {
-      nama: item.nama,
-      nisn: "-",
-      nomor_pendaftaran: "-"
-    }
-  }));
+  queueData = (data || []).map(item => {
+    const pendaftar = pendaftarMap[item.pendaftar_id] || {};
+
+    return {
+      ...item,
+      created_at: item.dipanggil_at,
+      pendaftar: {
+        id: item.pendaftar_id,
+        nama: item.nama || pendaftar.nama || "-",
+        nisn: pendaftar.nisn || "-",
+        nomor_pendaftaran: item.pendaftar_id || "-"
+      }
+    };
+  });
 
   renderQueue();
 }
@@ -628,9 +644,11 @@ async function loadQueue() {
 
         const actionCell = document.createElement("td");
         const action = document.createElement("button");
+        
         action.textContent =
-          item.status === "pending" ? "Panggil" :
+          item.status === "menunggu" ? "Panggil" :
           item.status === "dipanggil" ? "Selesaikan" :
+          item.status === "selesai" ? "Selesai" :
           "Ubah status";
 
         action.addEventListener("click", () =>
@@ -657,13 +675,14 @@ async function loadQueue() {
 
     
 async function updateQueueStatus(item) {
-  const nextStatus = {
-    pending: "dipanggil",
-    menunggu: "dipanggil",
-    dipanggil: "selesai",
-    selesai: "pending",
-    ditolak: "pending"
-  }[item.status];
+  
+const nextStatus = {
+  menunggu: "dipanggil",
+  pending: "dipanggil",
+  dipanggil: "selesai",
+  selesai: "menunggu",
+  ditolak: "menunggu"
+}[item.status];
 
   if (!nextStatus) {
     alert("Status antrean tidak dikenali.");
