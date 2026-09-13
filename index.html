@@ -645,10 +645,10 @@ async function loadQueue() {
         const action = document.createElement("button");
         
         action.textContent =
-          item.status === "menunggu" ? "Panggil" :
-          item.status === "dipanggil" ? "Selesaikan" :
-          item.status === "selesai" ? "Selesai" :
-          "Ubah status";
+  item.status === "pending" ? "Panggil" :
+  item.status === "dipanggil" ? "Selesaikan" :
+  item.status === "selesai" ? "Selesai" :
+  "Ubah status";
 
         action.addEventListener("click", () =>
           updateQueueStatus(item)
@@ -673,34 +673,34 @@ async function loadQueue() {
     }
 
     
+
 async function updateQueueStatus(item) {
-  
-const nextStatus = {
-  menunggu: "dipanggil",
-  pending: "dipanggil",
-  dipanggil: "selesai",
-  selesai: "menunggu",
-  ditolak: "menunggu"
-}[item.status];
+  const nextStatus = {
+    pending: "dipanggil",
+    menunggu: "dipanggil",
+    dipanggil: "selesai"
+  }[item.status];
 
   if (!nextStatus) {
-    alert("Status antrean tidak dikenali.");
+    alert("Antrean ini sudah selesai atau status tidak dikenali.");
     return;
   }
 
+  // 1. Update status antrean
   const { error: queueError } = await supabase
-    .from("panggilan")
+    .from("antrian_verifikasi")
     .update({
       status: nextStatus
     })
     .eq("id", item.id);
 
   if (queueError) {
-    alert("Gagal mengubah status: " + queueError.message);
+    alert("Gagal mengubah status antrean: " + queueError.message);
     console.error(queueError);
     return;
   }
 
+  // 2. Update status pendaftar
   if (item.pendaftar_id) {
     const { error: pendaftarError } = await supabase
       .from("pendaftar")
@@ -718,6 +718,7 @@ const nextStatus = {
     }
   }
 
+  // 3. Muat ulang antrean
   await loadQueue();
 }
     // =================================================
