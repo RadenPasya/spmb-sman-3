@@ -325,12 +325,8 @@
     import { createClient } from
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // =================================================
     // KONFIGURASI
-    // Ganti dua nilai berikut dengan konfigurasi project
-    // Supabase kamu.
-    // =================================================
-
+    
     const SUPABASE_URL = "https://nzhdzpnoommercrerqwl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56aGR6cG5vb21tZXJjcmVycXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MzE1MjcsImV4cCI6MjEwNDMwNzUyN30.KdFsaKc2e-AbwDtPl4facVgxo_ftPNjPij9_z4IeV4s";
 
@@ -374,10 +370,8 @@
       return labels[status] || status;
     }
 
-    // =================================================
     // DATA JALUR
-    // =================================================
-
+    
     async function loadJalur() {
       const { data, error } = await supabase
         .from("jalur")
@@ -402,10 +396,8 @@
       }
     }
 
-    // =================================================
     // PENDAFTARAN USER
-    // =================================================
-
+    
     $("registrationForm").addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -447,10 +439,7 @@
       $("registrationForm").reset();
     });
 
-    // =================================================
     // CEK STATUS USER
-    // =================================================
-
     
 $("statusForm").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -477,10 +466,8 @@ $("statusForm").addEventListener("submit", async (event) => {
   );
 });
 
-    // =================================================
     // LOGIN ADMIN
-    // =================================================
-
+    
     $("loginForm").addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -538,10 +525,7 @@ $("statusForm").addEventListener("submit", async (event) => {
       $("dashboard").classList.add("hidden");
     }
 
-    // =================================================
     // DASHBOARD ANTREAN
-    // =================================================
-
     
 
 async function loadQueue() {
@@ -777,10 +761,8 @@ async function updateQueueStatus(item) {
   
   await loadQueue();
 }
-    // =================================================
+    
     // SUPABASE REALTIME
-    // =================================================
-
     
 function startRealtime() {
   stopRealtime();
@@ -814,9 +796,7 @@ function startRealtime() {
       }
     }
 
-    // =================================================
     // NAVIGASI DAN INIT
-    // =================================================
 
     $("tabUser").addEventListener("click", () => setPage("user"));
     $("tabAdmin").addEventListener("click", () => setPage("admin"));
