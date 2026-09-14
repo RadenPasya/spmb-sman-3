@@ -1,22 +1,17 @@
 
--- =====================================================
 -- SPMB SMA NEGERI 3 TAMBUN SELATAN
--- SISTEM ANTREAN FIFO - V1
--- =====================================================
 
 create extension if not exists pgcrypto;
 
--- Hapus tabel lama yang berhubungan dengan dokumen.
+-- Hapus tabel lama.
 drop table if exists berkas cascade;
 
--- Hapus tabel antrean lama agar struktur bersih.
+-- Hapus tabel antrean lama.
 drop table if exists antrian_verifikasi cascade;
 drop table if exists pendaftar cascade;
 drop table if exists jalur cascade;
 
--- =====================================================
 -- 1. DATA JALUR
--- =====================================================
 
 create table jalur (
   id text primary key,
@@ -30,10 +25,7 @@ insert into jalur (id, nama, kuota, persen) values
   ('prestasi_akademik', 'Prestasi Akademik', 90, 25),
   ('prestasi_non', 'Prestasi Non Akademik', 90, 25);
 
--- =====================================================
 -- 2. PENDAFTAR
--- Tidak ada kolom upload dokumen.
--- =====================================================
 
 create table pendaftar (
   id uuid primary key default gen_random_uuid(),
@@ -47,10 +39,7 @@ create table pendaftar (
   updated_at timestamptz not null default now()
 );
 
--- =====================================================
 -- 3. ANTREAN FIFO
--- Satu nomor antrean untuk setiap pendaftar.
--- =====================================================
 
 create table antrian_verifikasi (
   id uuid primary key default gen_random_uuid(),
@@ -64,9 +53,7 @@ create table antrian_verifikasi (
   unique (jalur_id, nomor_antrian)
 );
 
--- =====================================================
 -- 4. NOMOR URUT PER JALUR
--- =====================================================
 
 create table counter_antrian (
   jalur_id text primary key references jalur(id),
@@ -76,11 +63,7 @@ create table counter_antrian (
 insert into counter_antrian (jalur_id)
 select id from jalur;
 
--- =====================================================
 -- 5. PROFIL ADMIN
--- Buat user admin terlebih dahulu di Supabase Auth.
--- Lalu masukkan UUID-nya ke tabel ini.
--- =====================================================
 
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -88,9 +71,7 @@ create table profiles (
     check (role in ('admin'))
 );
 
--- =====================================================
 -- 6. FUNGSI PENGECEKAN ADMIN
--- =====================================================
 
 create or replace function is_admin()
 returns boolean
@@ -107,11 +88,7 @@ as $$
   );
 $$;
 
--- =====================================================
 -- 7. FUNGSI PENDAFTARAN PUBLIK
--- Tidak membutuhkan login.
--- Nomor dibuat secara atomik dan FIFO.
--- =====================================================
 
 create or replace function daftar_spmb(
   p_nama text,
@@ -147,7 +124,6 @@ begin
     raise exception 'Jalur tidak valid';
   end if;
 
-  -- Mengunci counter jalur agar nomor tidak bentrok.
   select nomor_terakhir
   into v_nomor
   from counter_antrian
@@ -203,9 +179,7 @@ exception
 end;
 $$;
 
--- =====================================================
 -- 8. RLS
--- =====================================================
 
 alter table jalur enable row level security;
 alter table pendaftar enable row level security;
@@ -245,7 +219,6 @@ on profiles for select
 to authenticated
 using (id = auth.uid());
 
--- Hanya fungsi terkontrol yang boleh membuat pendaftaran.
 revoke insert, update, delete on pendaftar from anon, authenticated;
 revoke insert, update, delete on antrian_verifikasi from anon, authenticated;
 revoke all on counter_antrian from anon, authenticated;
@@ -253,9 +226,7 @@ revoke all on counter_antrian from anon, authenticated;
 grant execute on function daftar_spmb(text, text, text)
 to anon, authenticated;
 
--- =====================================================
 -- 9. REALTIME
--- =====================================================
 
 alter table pendaftar replica identity full;
 alter table antrian_verifikasi replica identity full;
