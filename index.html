@@ -35,6 +35,16 @@
     header .header-inner {
       max-width: 1100px;
       margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .school-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      flex-shrink: 0;
     }
 
     header h1 {
@@ -182,8 +192,15 @@
 <body>
   <header>
     <div class="header-inner">
-      <h1>SPMB SMA Negeri 3 Tambun Selatan</h1>
-      <p>Sistem Pendaftaran dan Antrean Verifikasi</p>
+      <img
+        src="logo-sekolah.png"
+        alt="Logo SMA Negeri 3 Tambun Selatan"
+        class="school-logo"
+      >
+      <div>
+        <h1>SPMB SMA Negeri 3 Tambun Selatan</h1>
+        <p>Sistem Pendaftaran dan Antrean Verifikasi</p>
+      </div>
     </div>
   </header>
 
